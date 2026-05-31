@@ -1,13 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { AnalyzeCommunityBaselinesUseCase, FixtureCommunityDeckRepository } from "../../src/features/analyze-community-baselines/index.js";
+import { AnalyzeCommunityBaselinesUseCase } from "../../src/features/analyze-community-baselines/index.js";
 import { AnalyzeDeckCompositionUseCase } from "../../src/features/analyze-deck-composition/index.js";
 import { BuildStrategicDiagnosisUseCase } from "../../src/features/build-strategic-diagnosis/index.js";
 import { ClassifyCardFeaturesUseCase, RuleBasedFeatureClassifier } from "../../src/features/classify-card-features/index.js";
 import { CuratedCommanderOptionRepository, DiscoverSimilarCommandersUseCase } from "../../src/features/discover-similar-commanders/index.js";
 import { EvaluateCommanderFitUseCase } from "../../src/features/evaluate-commander-fit/index.js";
-import { FetchCardDataUseCase, LocalCardRepository } from "../../src/features/fetch-card-data/index.js";
+import { FetchCardDataUseCase } from "../../src/features/fetch-card-data/index.js";
 import { parseMoxfieldDecklist } from "../../src/features/parse-moxfield-decklist/index.js";
 import { RecommendChangesUseCase } from "../../src/features/recommend-changes/index.js";
+import { FixtureTestCommunityDeckRepository } from "../helpers/fixtureCommunityDeckRepository.js";
+import { LocalTestCardRepository } from "../helpers/localCardRepository.js";
 
 const rawDecklist = "1 Sol Ring\n1 Fabled Passage\n1 Crucible of Worlds\n1 Hedron Archive\n\n1 Korvold, Fae-Cursed King";
 const gamePlan = {
@@ -30,7 +32,7 @@ describe("pipeline capabilities", () => {
     const parsed = parseMoxfieldDecklist({ rawDecklist });
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
-    const fetched = await new FetchCardDataUseCase(new LocalCardRepository()).execute({
+    const fetched = await new FetchCardDataUseCase(new LocalTestCardRepository()).execute({
       cardNames: [...parsed.value.deck.mainboard, ...parsed.value.deck.commanders].map((card) => card.name)
     });
     expect(fetched.ok).toBe(true);
@@ -54,7 +56,7 @@ describe("pipeline capabilities", () => {
       commanderFit: fit.commanderFit
     });
     expect(discovery.strategicExpressions.length).toBeGreaterThan(0);
-    const community = await new AnalyzeCommunityBaselinesUseCase(new FixtureCommunityDeckRepository()).execute({
+    const community = await new AnalyzeCommunityBaselinesUseCase(new FixtureTestCommunityDeckRepository()).execute({
       gamePlan,
       deckComposition: composition.composition,
       strategicExpressions: discovery.strategicExpressions

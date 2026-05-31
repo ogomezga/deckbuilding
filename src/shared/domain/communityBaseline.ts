@@ -30,7 +30,15 @@ export type CommunityFinding = {
 
 export type CommunityBaselineReport = {
   analyzedDecks: number;
+  dataSources: CommunityDataSourceReport[];
   featureBaselines: FeatureBaseline[];
   observedSolutions: ObservedSolution[];
   findings: CommunityFinding[];
+};
+
+export type CommunityDataSourceReport = {
+  source: string;
+  status: "queried" | "unavailable" | "failed";
+  evidence: string[];
+  warning?: string;
 };

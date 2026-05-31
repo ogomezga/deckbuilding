@@ -21,6 +21,7 @@ export class AnalyzeCommunityBaselinesUseCase {
 
   async execute(input: AnalyzeCommunityBaselinesInput): Promise<AnalyzeCommunityBaselinesOutput> {
     const decks = await this.communityDeckRepository.findSimilarDecks({
+      commander: input.gamePlan.commander,
       desiredFeatures: input.gamePlan.desiredFeatures,
       bracket: input.gamePlan.bracket,
       targetWinTurn: input.gamePlan.targetWinTurn,
@@ -31,7 +32,7 @@ export class AnalyzeCommunityBaselinesUseCase {
     const findings: CommunityBaselineReport["findings"] = [];
 
     for (const desired of input.gamePlan.desiredFeatures) {
-      const densities = decks.map(
+      const densities = decks.decks.map(
         (deck) => deck.strategicFeatures.filter((assignment) => assignment.name === desired.feature).length
       );
       if (densities.length === 0) continue;
@@ -54,20 +55,32 @@ export class AnalyzeCommunityBaselinesUseCase {
         observedRange: { lowerQuartile: baseline.lowerQuartile, upperQuartile: baseline.upperQuartile },
         evidence: [`Current Density: ${currentDensity}`, `Observed Median: ${baseline.medianDensity}`, `Sample Size: ${baseline.sampleSize}`]
       });
-      const cards = Array.from(new Set(decks.flatMap((deck) => deck.observedCards?.[desired.feature] ?? []))).slice(0, 4);
+      const cards = Array.from(new Set(decks.decks.flatMap((deck) => deck.observedCards?.[desired.feature] ?? []))).slice(0, 4);
       if (cards.length > 0) {
         observedSolutions.push({
           feature: desired.feature,
           cards,
-          occurrences: decks.filter((deck) => (deck.observedCards?.[desired.feature] ?? []).length > 0).length,
-          evidence: [`Observed solution cards for ${desired.feature} in fixture community decks.`]
+          occurrences: decks.decks.filter((deck) => (deck.observedCards?.[desired.feature] ?? []).length > 0).length,
+          evidence: [`Observed solution cards for ${desired.feature} from configured community sources.`]
         });
       }
     }
 
     return {
-      baselineReport: { analyzedDecks: decks.length, featureBaselines, observedSolutions, findings },
-      warnings: decks.length === 0 ? [{ reason: "No similar community fixture decks found." }] : []
+      baselineReport: {
+        analyzedDecks: decks.decks.length,
+        dataSources: decks.sources,
+        featureBaselines,
+        observedSolutions,
+        findings
+      },
+      warnings:
+        decks.decks.length === 0
+          ? [
+              ...decks.warnings,
+              { reason: "Community baselines unavailable: configured community sources did not return deck-level feature data." }
+            ]
+          : decks.warnings
     };
   }
 }

@@ -18,6 +18,8 @@ import type { CommunityBaselineReport } from "../../../shared/domain/communityBa
 import type { CommanderFit } from "../../../shared/domain/commanderFit.js";
 import type { StrategicExpression } from "../../../shared/domain/strategicExpression.js";
 import type { ParsedDeck } from "../../../shared/domain/deck.js";
+import type { DataSourceMetadata } from "../../../shared/domain/dataSource.js";
+import type { ResponseSynthesizer } from "./responseSynthesizer.js";
 
 export type OrchestrateAgentWorkflowInput = {
   rawDecklist: string;
@@ -39,6 +41,8 @@ export type AnalysisSession = {
   communityBaselineReport?: CommunityBaselineReport;
   diagnosis?: StrategicDiagnosis;
   recommendations?: Recommendation[];
+  responseSynthesis?: string;
+  dataSources?: DataSourceMetadata;
 };
 
 export type OrchestrateAgentWorkflowOutput = {
@@ -56,6 +60,8 @@ export type OrchestratorDependencies = {
   analyzeCommunityBaselines: AnalyzeCommunityBaselinesUseCase;
   buildStrategicDiagnosis: BuildStrategicDiagnosisUseCase;
   recommendChanges: RecommendChangesUseCase;
+  responseSynthesizer: ResponseSynthesizer;
+  dataSources: DataSourceMetadata;
 };
 
 export class OrchestrateAgentWorkflowUseCase {
@@ -121,6 +127,7 @@ export class OrchestrateAgentWorkflowUseCase {
       deckComposition: compositionOutput.composition,
       strategicExpressions: commanderDiscoveryOutput.strategicExpressions
     });
+    warnings.push(...communityOutput.warnings.map((warning) => ({ reason: warning.reason })));
 
     const diagnosisOutput = await this.dependencies.buildStrategicDiagnosis.execute({
       gamePlan: gamePlanOutput.gamePlan,
@@ -138,6 +145,15 @@ export class OrchestrateAgentWorkflowUseCase {
       communityBaselineReport: communityOutput.baselineReport
     });
 
+    const responseSynthesis = await this.dependencies.responseSynthesizer.synthesize({
+      gamePlan: gamePlanOutput.gamePlan,
+      composition: compositionOutput.composition,
+      commanderFit: commanderFitOutput.commanderFit,
+      communityBaselineReport: communityOutput.baselineReport,
+      diagnosis: diagnosisOutput.diagnosis,
+      recommendations: recommendationsOutput.recommendations
+    });
+
     return {
       session: {
         deck: parsed.value.deck,
@@ -149,7 +165,9 @@ export class OrchestrateAgentWorkflowUseCase {
         strategicExpressions: commanderDiscoveryOutput.strategicExpressions,
         communityBaselineReport: communityOutput.baselineReport,
         diagnosis: diagnosisOutput.diagnosis,
-        recommendations: recommendationsOutput.recommendations
+        recommendations: recommendationsOutput.recommendations,
+        responseSynthesis,
+        dataSources: this.dependencies.dataSources
       },
       warnings
     };

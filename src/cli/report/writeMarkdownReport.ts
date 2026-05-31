@@ -12,6 +12,19 @@ export function renderMarkdownReport(output: OrchestrateAgentWorkflowOutput): st
   const recs = session.recommendations;
   return `# Deck Analysis Report
 
+## Data Sources
+
+- Card metadata: ${session.dataSources.cardMetadata.source} (${session.dataSources.cardMetadata.status})
+- Game plan extraction: ${session.dataSources.gamePlanExtraction.source} (${session.dataSources.gamePlanExtraction.status})
+- Feature classification: ${session.dataSources.featureClassification.source} (${session.dataSources.featureClassification.status})
+- Community baselines: ${session.dataSources.communityBaselines.source} (${session.dataSources.communityBaselines.status})${session.dataSources.communityBaselines.warning ? ` - ${session.dataSources.communityBaselines.warning}` : ""}
+- Commander options: ${session.dataSources.commanderOptions.source} (${session.dataSources.commanderOptions.status})
+- Response synthesis: ${session.dataSources.responseSynthesis.source} (${session.dataSources.responseSynthesis.status})
+
+## Synthesized Summary
+
+${session.responseSynthesis}
+
 ## Game Plan
 
 ${session.gamePlan.primaryObjective}
@@ -39,6 +52,10 @@ ${session.strategicExpressions.map((expression) => `- ${expression.name}: ${expr
 ## Community Evidence
 
 ${session.communityBaselineReport.findings.map((finding) => `- ${finding.feature}: current ${finding.currentDensity}, observed median ${finding.observedMedian}`).join("\n") || "- No community evidence available."}
+
+### Community Source Status
+
+${session.communityBaselineReport.dataSources.map((source) => `- ${source.source}: ${source.status}${source.warning ? ` - ${source.warning}` : ""}`).join("\n") || "- No community sources configured."}
 
 ## Strategic Diagnosis
 

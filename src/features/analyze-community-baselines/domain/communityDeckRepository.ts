@@ -3,6 +3,7 @@ import type { DesiredFeature } from "../../../shared/domain/feature.js";
 import type { FeatureAssignment } from "../../../shared/domain/featureAssignment.js";
 
 export type SimilarDeckCriteria = {
+  commander: string;
   desiredFeatures: DesiredFeature[];
   bracket?: number;
   targetWinTurn?: number;
@@ -17,5 +18,21 @@ export type CommunityDeck = {
 };
 
 export interface CommunityDeckRepository {
-  findSimilarDecks(criteria: SimilarDeckCriteria): Promise<CommunityDeck[]>;
+  findSimilarDecks(criteria: SimilarDeckCriteria): Promise<CommunityDeckRepositoryResult>;
+}
+
+export type CommunityDeckRepositoryResult = {
+  decks: CommunityDeck[];
+  warnings: Array<{ reason: string }>;
+  sources: Array<{
+    source: string;
+    status: "queried" | "unavailable" | "failed";
+    evidence: string[];
+    warning?: string;
+  }>;
+};
+
+export interface CommunityDeckSource {
+  readonly sourceName: string;
+  findSimilarDecks(criteria: SimilarDeckCriteria): Promise<CommunityDeckRepositoryResult>;
 }

@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { z } from "zod";
-import { createDefaultOrchestrator } from "../../appFactory.js";
+import { createRuntimeOrchestrator, runtimeConfigFromEnv } from "../../appFactory.js";
 import type { CommanderPreference } from "../../shared/domain/playerPreferences.js";
 import { writeJsonOutputsBesideReport } from "../report/writeJsonOutputs.js";
 import { writeMarkdownReport } from "../report/writeMarkdownReport.js";
@@ -21,7 +21,7 @@ export async function runAnalyzeCommand(argv: string[]): Promise<void> {
     readFile(parsed.deck, "utf8"),
     readFile(parsed.goal, "utf8")
   ]);
-  const orchestrator = createDefaultOrchestrator();
+  const orchestrator = createRuntimeOrchestrator(runtimeConfigFromEnv());
   const output = await orchestrator.execute({
     rawDecklist,
     goalDescription,

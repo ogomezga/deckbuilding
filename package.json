@@ -9,7 +9,6 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "cli": "node dist/src/cli/cli.js",
-    "analyze:sample": "tsc -p tsconfig.json && node dist/src/cli/cli.js analyze --deck decks/korvold.txt --goal goals/korvold-landfall.txt --commander_preference prefer_current --output reports/korvold-analysis.md --targetWinTurn 6 --bracket 3",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
