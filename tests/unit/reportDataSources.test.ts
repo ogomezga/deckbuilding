@@ -8,10 +8,10 @@ describe("Markdown report data sources", () => {
     const markdown = renderMarkdownReport(output);
     expect(markdown).toContain("## Data Sources");
     expect(markdown).toContain("Card metadata: Scryfall");
-    expect(markdown).toContain("Game plan extraction: OpenAI (gpt-5-mini)");
+    expect(markdown).toContain("Game plan extraction: Codex-created artifact");
     expect(markdown).toContain("Community baselines: EDHREC, MTGGoldfish, Archidekt (unavailable)");
     expect(markdown).toContain("deck-level feature baselines are unavailable");
-    expect(markdown).toContain("EDHREC: queried");
+    expect(markdown).toContain("EDHREC: unavailable");
     expect(markdown).toContain("## Synthesized Summary");
   });
 });
@@ -59,7 +59,7 @@ function minimalOutput(): OrchestrateAgentWorkflowOutput {
         dataSources: [
           {
             source: "EDHREC",
-            status: "queried",
+            status: "unavailable",
             evidence: ["Requested EDHREC commander page."],
             warning: "Deck-level feature baselines are unavailable."
           }
@@ -78,10 +78,10 @@ function minimalOutput(): OrchestrateAgentWorkflowOutput {
         supportingEvidence: []
       },
       recommendations: [],
-      responseSynthesis: "LLM-generated summary.",
+      responseSynthesis: "Codex-generated summary.",
       dataSources: {
         cardMetadata: { source: "Scryfall", status: "available" },
-        gamePlanExtraction: { source: "OpenAI (gpt-5-mini)", status: "available" },
+        gamePlanExtraction: { source: "Codex-created artifact", status: "available" },
         featureClassification: { source: "rule-based", status: "available" },
         communityBaselines: {
           source: "EDHREC, MTGGoldfish, Archidekt",
@@ -90,7 +90,7 @@ function minimalOutput(): OrchestrateAgentWorkflowOutput {
             "Configured community sources are queried, but deck-level feature baselines are unavailable until source-specific deck parsing is implemented."
         },
         commanderOptions: { source: "curated dataset", status: "available" },
-        responseSynthesis: { source: "OpenAI (gpt-5-mini)", status: "available" }
+        responseSynthesis: { source: "Codex interactive session", status: "available" }
       }
     }
   };

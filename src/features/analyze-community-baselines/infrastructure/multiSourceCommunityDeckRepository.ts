@@ -53,7 +53,7 @@ export abstract class HttpCommunityDeckSource implements CommunityDeckSource {
         decks: [],
         warnings: [
           {
-            reason: `${this.sourceName} community source failed: ${
+            reason: `${this.sourceName} community evidence unavailable: ${
               error instanceof Error ? error.message : "unknown error"
             }`
           }
@@ -61,9 +61,9 @@ export abstract class HttpCommunityDeckSource implements CommunityDeckSource {
         sources: [
           {
             source: this.sourceName,
-            status: "failed",
+            status: "unavailable",
             evidence: [`Requested ${url}.`],
-            warning: error instanceof Error ? error.message : "Unknown community source failure."
+            warning: error instanceof Error ? error.message : "Community source could not be queried."
           }
         ]
       };
@@ -77,7 +77,7 @@ export abstract class HttpCommunityDeckSource implements CommunityDeckSource {
       sources: [
         {
           source: this.sourceName,
-          status: "queried",
+          status: "unavailable",
           evidence,
           warning
         }

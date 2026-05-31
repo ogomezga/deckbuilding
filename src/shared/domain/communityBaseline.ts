@@ -38,7 +38,7 @@ export type CommunityBaselineReport = {
 
 export type CommunityDataSourceReport = {
   source: string;
-  status: "queried" | "unavailable" | "failed";
+  status: "queried" | "unavailable";
   evidence: string[];
   warning?: string;
 };

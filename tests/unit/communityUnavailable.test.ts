@@ -16,7 +16,7 @@ describe("unavailable community baselines", () => {
           sources: [
             {
               source: "EDHREC",
-              status: "queried",
+              status: "unavailable",
               evidence: ["Requested EDHREC commander page."],
               warning: "Deck-level feature data unavailable."
             }
