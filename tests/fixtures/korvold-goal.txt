@@ -1,0 +1,1 @@
+Use fetchlands, land sacrifice and land recursion to trigger landfall repeatedly, grow creatures with +1/+1 counters and win through combat damage around turn 6. No infinite combos.
